@@ -87,6 +87,7 @@ class DockRenderer:
         self.theme = Gtk.IconTheme.get_default()
         self.apps = []
         self.opened_at = None
+        self.pressed_idx = None
         self.reload_apps()
 
     def reload_apps(self):
@@ -109,7 +110,7 @@ class DockRenderer:
     def render(self):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.w, self.h)
         cr = cairo.Context(surface)
-        cr.set_source_rgb(0.035, 0.043, 0.062)
+        cr.set_source_rgb(0.0, 0.0, 0.0)
         cr.paint()
 
         x_offset = 12
@@ -117,6 +118,17 @@ class DockRenderer:
             slot_x = x_offset + (i * self.slot_w)
             if slot_x + self.slot_w > self.w:
                 break
+
+            # DOKUNMA EFEKTİ (Neon Amethyst Glow)
+            if self.pressed_idx == i:
+                cr.set_source_rgba(0.75, 0.52, 0.99, 0.40)
+                cr.rectangle(slot_x + 4, 6, self.slot_w - 8, self.h - 12)
+                cr.fill()
+                cr.set_source_rgba(0.85, 0.65, 1.0, 0.9)
+                cr.set_line_width(2.0)
+                cr.rectangle(slot_x + 4, 6, self.slot_w - 8, self.h - 12)
+                cr.stroke()
+
             pb = self.load_pixbuf(app["icon"])
             if pb:
                 ix = slot_x + (self.slot_w - pb.get_width()) // 2
@@ -134,6 +146,8 @@ class DockRenderer:
         x_offset = 12
         idx = int((tap_x - x_offset) // self.slot_w)
         if 0 <= idx < len(self.apps):
+            self.pressed_idx = idx
+            self.render()
             app = self.apps[idx]
             try:
                 subprocess.Popen(["gtk-launch", app["id"]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -142,12 +156,13 @@ class DockRenderer:
                     subprocess.Popen(["gio", "launch", app["path"]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 except Exception:
                     pass
+            time.sleep(0.09)  # Efektin net görünmesi için mikro bekleme
+        self.pressed_idx = None
         self.opened_at = None
         return_to_control()
 
 def main():
     dock = DockRenderer()
-    # Başlar başlamaz ilk kareyi hemen bas (saniye kaybetme)
     dock.render()
     last_frame = time.time()
     last_dock_check = 0
@@ -175,13 +190,10 @@ def main():
                 last_frame = time.time()
 
         now = time.time()
-
-        # 5 saniye dokunulmazsa otomatik geri dön
         if dock.opened_at and (now - dock.opened_at >= 5.0):
             dock.opened_at = None
             return_to_control()
 
-        # Dock güncellemelerini yakala
         if now - last_dock_check >= 1.0:
             last_dock_check = now
             try:
