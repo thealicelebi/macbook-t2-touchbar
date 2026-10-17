@@ -1,0 +1,3 @@
+name = "weather"
+description = "Multi-City Weather Bar"
+exec = "weather.py"

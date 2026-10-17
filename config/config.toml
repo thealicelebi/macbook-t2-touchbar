@@ -1,0 +1,49 @@
+[settings]
+default_layer = "control"
+esc = "auto"
+dim_after = 30
+off_after = 60
+max_brightness = 160
+slider_timeout = 5
+fingerprint_width = 440
+dim_while_scanning = true
+nowplaying = "bars"
+viz_colors = "amethyst"
+
+[weather]
+location = "Istanbul"
+units = "metric"
+clock = "24h"
+
+[theme]
+background = "#090B10"
+button = "#171B28"
+accent = "#A78BFA"
+foreground = "#F5F3FF"
+
+[layers.control]
+items = [
+  "esc",
+  "gap",
+  { icon = "󰀻", label = "Apps", layer = "apps", width = 85 },
+  { icon = "󰄀", command = "gnome-screenshot -i", width = 70 },
+  { preset = "weather", layer = "weather" },
+  "nowplaying",
+  "media",
+  "gap",
+  "brightness", "keyboard",
+  "gap",
+  "volume", "mute",
+]
+
+[layers.apps]
+items = [
+  "back",
+  { plugin = "dock", width = 1850, label = " ", style = "plain" }
+]
+
+[layers.weather]
+items = [
+  "back",
+  { plugin = "weather", width = 1850, label = " ", style = "plain" }
+]

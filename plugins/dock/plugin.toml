@@ -1,0 +1,4 @@
+name = "dock"
+description = "Ubuntu Dock Color Icons"
+exec = "dock.py"
+background = true
